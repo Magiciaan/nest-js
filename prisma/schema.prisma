@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String @id @default(uuid())
+  name  String
+  email String @unique
+
+  Comment Comment[]
+  Product Product[]
+}
+
+model Comment {
+  id          String   @id @default(uuid())
+  comment     String
+  commentById String
+  commentOnId String
+  postedOn    DateTime @default(now())
+  updatedOn   DateTime @default(now())
+
+  itemId    String?
+  productId String?
+
+  user    User     @relation(fields: [commentById], references: [id])
+  product Product? @relation(fields: [productId], references: [id])
+}
+
+model Category {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  parentId    Int?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String  @id @default(uuid())
+  name        String
+  categoryId  String
+  price       Int
+  description String
+  sellerId    String
+  commentId   String
+  sold        Boolean
+  negotiable  Boolean
+
+  postedOn  DateTime @default(now())
+  updatedOn DateTime @default(now())
+
+  comments Comment[]
+
+  user     User     @relation(fields: [sellerId], references: [id])
+  category Category @relation(references: [id], fields: [categoryId])
+}
