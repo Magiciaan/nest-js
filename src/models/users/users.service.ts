@@ -15,5 +15,22 @@ export class UsersService {
     return await this.prisma.user.findUnique({ where: { id } });
   }
 
-  //   async registerUser(client_id, scope, state) {}
+  async googleLogin(req) {
+    try {
+      if (!req.user) {
+        return 'No User from Google';
+      }
+
+      const newUser = await this.prisma.user.create({
+        data: {
+          name: req.user.displayName,
+          email: req.users.emails[0].value,
+        },
+      });
+
+      return newUser;
+    } catch (error) {
+      return error;
+    }
+  }
 }

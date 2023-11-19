@@ -3,11 +3,14 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Req,
+  UseGuards,
   //   Post,
   //   Query,
 } from '@nestjs/common';
 // import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -19,8 +22,14 @@ export class UsersController {
     return this.userService.fetchUsers();
   }
 
-  @Get('google')
-  async auth() {}
+  @Get('auth')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+  @Get('redirect')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req) {
+    return this.userService.googleLogin(req);
+  }
 
   @Get(':id')
   getUserById(@Param('id', ParseUUIDPipe) id: string) {
